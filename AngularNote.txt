@@ -1,0 +1,240 @@
+					
+---------------------------------Create a new component--------------------------------------
+
+ng generate component heroes 	// heroes is a name component
+ng new angular-project    	// create a new project . angular-project is a name of project
+
+cd angular-project    	//go to prj directory and launch the application
+ng serve --open		//go to prj directory and launch the application
+
+
+~1 component thành lập bởi ít nhất 1 phần code html gọi là template, 1 class typescript dữ liệu, xử lý và tương tác với template, và selector
+~1 dự án có thể có nhiều component
+
+-----------------------------------Two-way binding--------------------------------------------
+
+<input [(ngModel)]="hero.name" placeholder="name">
+
+You need import FormsModule into app.module.ts
+
+import { FormsModule } from '@angular/forms'; // <-- NgModel lives here
+
+then add FormsModule to the @NgModule 
+
+	imports: [
+	  BrowserModule,
+	  FormsModule
+	],
+
+-khi để [(ngModel)] trong tag Form thì thêm dòng [ngModelOptions]="{standalone: true}" trong các thẻ dùng [(ngModel)]
+
+			
+-----------------------------------------MODULE----------------------------------------------
+
+NgModule được import: import { NgModule } from '@angular/core';
+-được khái báo thông qua 1 object có 4 thuộc tính: declaretions, imports, providers, bootstrap.
+
+@NgModule({
+   declarations: [
+      AppComponent
+   ],
+   imports: [
+      BrowserModule
+   ],
+   providers: [],
+   bootstrap: [AppComponent]
+})
+
+1) Delaretion.
+-là một mảng chứa các khai báo, khi tạo thêm component thì declaretion sẽ thêm khai báo vào 
+ví dụ thêm component NewCmpComponent
+
+declarations: [
+   AppComponent,
+   NewCmpComponent
+]
+
+2) import.
+-là 1 mảng chứa các module sử dụng trong ứng dụng or các module sử dụng trong các component .
+default sẽ có BrowerModule đc import.
+-để import 1 module chúng ta cần 2 bước, khái báo import module và khai báo mảng imports.
+ví dụ. chúng ta cần import module form cho ứng dụng trước tiên cần khi báo module này đc import từ @angular/forms
+
+import @angular/forms:
+
+import { FormsModule } from @angular/forms;
+
+sau đó thêm khai báo mảng import:
+
+imports: [
+   BrowserModule,
+   FormsModule // Module form mới được thêm
+]
+
+3)Providers.
+-provider chứa các service mà chúng ta tạo ra.
+
+4)Bootstrap.
+-Chứa các component chính thực thi chương trình, đó là tất cả về module.
+
+
+----------------------------------Data binding----------------------------------------------
+
+-Data binding là cơ chế lấy dữ liệu từ trong component và đưa ra view.
+-Để bind dữ liệu ra view, ta sử dụng cặp ngoặc nhọn {{ten_bien}}. ten_bien chính là tên biến bạn đặt phía bên trong file component.ts
+
+truyền dữ liệu từ component sang view có 5 quy tắc:
+~ Interpolation:{{value}}
+	-VD: Hiển thị 1 string, number, phép toán điều kiện 3 ngôi, 1 phương thức, 1 geter, 1 nullable để hiển thị hình ảnh, video, đường link.
+~ Property: [property-name]="value"
+	-VD: src, value, href, disabled, hidden
+	-Khác: bind-property-name = "value"
+~ Attribute:[attr.attribute_name]="value"
+	-VD: colspan, href, border, height, width.
+~Class Binding: [class.class_name] = "value"
+	-VD: Sử dụng 1 biến Boolean, 1 biến kiểu number, string để so sánh
+	-Chỉ Áp dụng cho 1 Class.
+~Style Binding:[style.style_name]="value"
+	-VD:[style.color]="color_name".[style.color]="true ? màu 1: màu 2"
+	-Chỉ Áp dụng cho 1 style
+
+1) data Binding voi ngFor:
+ví dụ:
+
+import { Component } from '@angular/core';
+ 
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+    title = 'Angular 4 Project!';
+    // Khai báo mảng chứa các tháng
+    months = ["Tháng 1", "Tháng 2", "Tháng 3",
+                "Tháng 4", "Tháng 5", "Tháng 6",
+                "Tháng 7", "Tháng 8", "Tháng 9",
+                "Tháng 10", "Tháng 11", "Tháng 12"];
+}
+
+tiếp đó ta  bind data ra file.
+
+<div> Months :
+    <select>
+        <option *ngFor="let i of months">{{i}}</option>
+    </select>
+</div>
+
+2) data binding voi ngIf.
+
+ví dụ: file app.component.html
+
+<p *ngIf="condition; then true_condition else false_condition"></p>
+<ng-template #true_condition>Dieu Kien Dung</ng-template>
+<ng-template #false_condition>Dieu Kien Sai</ng-template>
+
+Vế then true_condition có thể được lược bỏ và viết trực tiếp nội dung điều kiện đúng vào trong thẻ chứa ngIf, như sau:
+
+<p *ngIf="condition; else false_condition"></p>
+<ng-template #true_condition>Dieu Kien Dung</ng-template>
+<ng-template #false_condition>Dieu Kien Sai</ng-template>
+
+			--------------Event binding-----------
+
+phát sinh khi người dùng bàn phím. click chuột, di chuyển chuột..
+
+cú pháp: (event_name) = "function_name($event)"
+
+event_name: tên event (click, mouseover, mouseenter,...)
+function_name: tên function trong file component.ts
+
+cách 1:
+
+
+1) sự kiện click
+file html:
+// Tạo button và gán sự kiện cho button
+<button (click)="myClickFunction($event)">Click Me</button>
+
+file: .ts
+
+// Khai báo hàm xử lý sự kiện cho button
+    myClickFunction(event) {
+        alert("Nhận được lệnh click từ button");
+    }
+
+
+		------------------------Directive----------------------------
+
+Directive là 1 class js
+có 3 loại: + Component Directive, Structural directive và Attribute directive.
+
+-Component Directive (Directive Thành Phần)
+-Structural directive (Directive cấu trúc):
+sẽ quyết địng dom nào được thực thi, thường có dấu '*' ở trước directive. tiêu biểu là *ngIf và *ngFor.
+-Attribute directive (Directive thuộc tính)
+Directive đc sử dụng như thuộc tính của thẻ HTML (giống như <a> có thuộc tính href)
+
+		
+I)	Tạo Custom directive.
+
+lệnh  ng g directive <ten_directive>
+
+-trong file *.directive.ts
+import thêm:
+
+	import { Directive, ElementRef } from '@angular/core';
+	import { element } from 'protractor';
+
+và trong constructor thêm:
+
+	constructor(private el: ElementRef) {
+	       el.nativeElement.style.backgroundColor = 'yellow';
+	}
+
+ElementRef là class của thư viện Angular, dùng nó để tham chiếu đến các phần tử DOM trong cpn hiện tại, và dùng thuộc tính ElementRef để lấy đối tượng DOM để thay đổi thuộc tính của nó (css, text,..)
+
+II) tương tác Directive với người dùng.
+
+muốn tương tác thì import thêm HostListener.
+
+	import { Directive, ElementRef, HostListener } from '@angular/core';
+
+tiếp theo thêm hàm xủ lý sự kiện xảy ra bằng cách sử dụng Decorator HostListener
+
+	@HostListener('mouseenter') onMouseEnter(){
+		this.highlight('yellow');
+	}
+
+	@HostListener('mouseleave') onMouseLeave(){
+		this.highlight(null);
+	}
+
+	private highlight(color: string){
+		this.el.nativeElement.style.backgroundColor = color;
+	}
+
+--> thêm vào private cho el trong constructor nếu không sẽ lỗi.
+
+III) Pass dữ liệu vào directive thông qua @input.
+đầu tiên import input vào.
+
+	import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+
+
+
+
+	---------------------------PIPE-----------------------------------------
+
+-Pipes transform displayed values within a template.
+
+
+
+
+
+
+
+
+
+
+
