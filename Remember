@@ -1,0 +1,204 @@
+get admin password: cat /etc/syncwerk/admin.txt
+map dynamic value for i18n  [innerHTML]="'FORMS.REQUIRED.PUBLIC_SHARE_PASSWORD_LENGTH' | translate: {'numberOfCharacters': numberOfCharacters }"
+
+cd /usr/share/python/syncwerk/scripts/
+
+
+Baukobox:
+
+SSH  ssh thien@malta2924.startdedicated.de
+Pass: minhthien96
+
+SSH  ssh thien@fulda240.server4you.de
+Pass: minhthien96
+
+sudo vi /
+127.0.0.1       localhost       alpha.syncwerk.com
+127.0.1.1       ew.u18  ew
+127.0.1.1       parkhound.test  www.parkhound.test
+127.0.1.1       spacer.test     www.spacer.test
+127.0.1.1       api.parkhound.test      www.api.parkhound.test
+
+--------------------------Spacer----------------------------
+pacer-db:
+  image: docker.io/trantranews/mysql57
+  container_name: spacer-db
+  ports:
+      - "3306:3306"
+  environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: parkhound
+      MYSQL_USER: parkhound
+      MYSQL_PASSWORD: parkhound
+  volumes:
+    - /home/thien/Code/ParkHound:/opt
+    - /home/thien/spacer_db:/var/lib/mysql
+  cpu_quota: 50000
+spacer-server:
+  image: docker.io/trantranews/ubuntu16-php56-apache
+  container_name: spacer-server
+  ports:
+    - "80:80"
+  environment:
+      - VIRTUAL_HOST=spacer.test
+  volumes:
+    - .:/var/www/spacer
+    - ./docker/ubuntu-php:/etc/apache2/sites-enabled
+  links:
+    - spacer-db
+  extra_hosts:
+    - "spacer.test:127.0.0.1"
+
+-----------------------docker-compose.yml ParkHound----------------------
+
+nginx-proxy:
+  image: jwilder/nginx-proxy
+  ports:
+    - "80:80"
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+
+parkhound-db:
+  image: hieutangews/ph-mysql55
+  container_name: parkhound-db1
+  ports:
+      - "3307:3306"
+  environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: parkhound
+      MYSQL_USER: parkhound
+      MYSQL_PASSWORD: parkhound
+  volumes:
+    - ./../:/opt
+    - /home/thien/parkhound_db:/var/lib/mysql
+  cpu_quota: 50000
+parkhound-server:
+  image: hieutangews/ph-apache-php
+  container_name: parkhound-server1
+  ports:
+      - "8081:80"
+  environment:
+      - VIRTUAL_HOST=parkhound.test
+  volumes:
+    - .:/var/www/parkhound
+    - ./docker/apache-php:/etc/apache2/sites-enabled
+  links:
+    - parkhound-db
+  external_links:
+    - parkhound_nginx-proxy_1:spacer.test
+  extra_hosts:
+    - "parkhound.test:127.0.0.1"
+
+-------------------------docker-compose.yml Spacer---------------------------
+spacer-db:
+  image: docker.io/trantranews/mysql57
+  container_name: spacer-db
+  ports:
+      - "3306:3306"
+  environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: parkhound
+      MYSQL_USER: parkhound
+      MYSQL_PASSWORD: parkhound
+  volumes:
+    - /home/thien/Code/ParkHound:/opt
+    - /home/thien/spacer_db:/var/lib/mysql
+  cpu_quota: 50000
+spacer-server:
+  image: docker.io/trantranews/ubuntu16-php56-apache
+  container_name: spacer-server
+  ports:
+    - "80:80"
+  environment:
+      - VIRTUAL_HOST=spacer.test
+  volumes:
+    - .:/var/www/spacer
+    - ./docker/ubuntu-php:/etc/apache2/sites-enabled
+  links:
+    - spacer-db
+  extra_hosts:
+    - "spacer.test:127.0.0.1"
+
+
+--------------------------------------------------------------                                  
+
+- view list Items:  $ ls ../       ex:[:~/Code/ParkHound/Parkhound$ vi docker-compose.yml]
+- view file docker-compose.yml: $ vi docker-compose.yml   ex:[thien@ew:~/Code/ParkHound/Parkhound$ vi docker-compose.yml]
+
+-mysql> source /opt/parkhound_www_20181007.sql
+-exec docker: thien@ew:~/Code/ParkHound/Parkhound$ docker exec -it parkhound-db1 bash
+-access mysql: root@682ec769d7b5:/# mysql -u root -p   [pass: root]
+-show databases: mysql> show databases;
+-use databases: mysql> use parkhound;
+-show tables: mysql> show tables;
+
+
+
+------------------------------
+
+
+nginx-proxy:
+  image: jwilder/nginx-proxy
+  ports:
+    - "80:80"
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+
+parkhound-db:
+  image: hieutangews/ph-mysql55
+  container_name: parkhound-db1
+  ports:
+      - "3307:3306"
+  environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: parkhound
+      MYSQL_USER: parkhound
+      MYSQL_PASSWORD: parkhound
+  volumes:
+    - ./../:/opt
+    - /home/thien/parkhound_db:/var/lib/mysql
+  cpu_quota: 50000
+parkhound-server:
+  image: hieutangews/ph-apache-php
+  container_name: parkhound-server1
+  ports:
+      - "8081:80"
+  environment:
+      - VIRTUAL_HOST=parkhound.test
+  volumes:
+    - .:/var/www/parkhound
+    - ./docker/apache-php:/etc/apache2/sites-enabled
+  links:
+    - parkhound-db
+  external_links:
+    - parkhound_nginx-proxy_1:spacer.test
+  extra_hosts:
+    - "parkhound.test:127.0.0.1"
+
+
+----------PARKHOUND-----------------
+link design:  https://app.zeplin.io/project/5cd2457d36dbe434b42a39aa/screen/5cdb87999941ae689f57a236
+roles push the code: http://karma-runner.github.io/3.0/dev/git-commit-msg.html
+fake credit card: https://dox.merchantwarrior.com/#test-credit-cards
+connect db: parkhound.test:8080
+	-server:parkhound-db
+	-name: parkhound
+	-pass: parkhound
+
+-create mirgate:
+	$ docker exec -it -u www-data parkhound-server1 bash
+	$ cd var/www/parkhound/protected/
+	$ ./yiic migrate create update_content_tbl_airport_parking_landing
+-run mirgate: 
+	./yiic migrate
+-revert mirgate:
+	./yiic migrate down
+
+- console log error :
+	-thien@ew:~/Code/ParkHound/Parkhound$ tail -f protected/runtime/application.log 
+
+
+
+
+
+
